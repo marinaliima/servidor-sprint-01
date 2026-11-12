@@ -6,69 +6,72 @@ const porta = 3000;
 const status = { "Código": 200, "Mensagem": "Servidor Node.js com Express funcionando!" };
 
 const escola = [
- {
-  "Nome": "SENAI",
-  "Cidade": "São Paulo",
-  "Tipo": "Ensino Técnico"
- },
- {
-    "Nome": "SESI",
-    "Cidade": "Valinhos",
-    "Tipo": "Ensino Médio"
- },
- {
-    "Nome": "Unicamp",
-    "Cidade": "Campinas",
-    "Tipo": "Ensino Superior"
- }
+   {
+      "Nome": "SENAI",
+      "Cidade": "São Paulo",
+      "Tipo": "Ensino Técnico"
+   },
+   {
+      "Nome": "SESI",
+      "Cidade": "Valinhos",
+      "Tipo": "Ensino Médio"
+   },
+   {
+      "Nome": "Unicamp",
+      "Cidade": "Campinas",
+      "Tipo": "Ensino Superior"
+   }
 ];
 
 const cursos = [
- {
-    "ID": 1,
-    "Nome": "Desenvolvimento de Sistemas"
- },
- {
-    "ID": 2,
-    "Nome": "Redes de Computadores"
- },
- {
-    "ID": 3,
-    "Nome": "Administração"
- }
+   {
+      "ID": 1,
+      "Nome": "Desenvolvimento de Sistemas"
+   },
+   {
+      "ID": 2,
+      "Nome": "Redes de Computadores"
+   },
+   {
+      "ID": 3,
+      "Nome": "Administração"
+   }
 ];
 
 const professor = [
- {
-    "Nome": "Julia",
-    "Disciplina": "Back-End I"
- },
- {
-    "Nome": "Gabriel",
-    "Disciplina": "Linguagem de Marcação"
- },
- {
-    "Nome": "Ana",
-    "Disciplina": "Banco de Dados"
- },
- {
-    "Nome": "Guilherme",
-    "Disciplina": "Projetos de Software I"
- }
+   {
+      "Nome": "Julia",
+      "Disciplina": "Back-End I"
+   },
+   {
+      "Nome": "Gabriel",
+      "Disciplina": "Linguagem de Marcação"
+   },
+   {
+      "Nome": "Ana",
+      "Disciplina": "Banco de Dados"
+   },
+   {
+      "Nome": "Guilherme",
+      "Disciplina": "Projetos de Software I"
+   }
 ];
 
 const mensagens = [
-  { id: 1, usuario: "Ana", texto: "Bom dia!" },
-  { id: 2, usuario: "Pedro", texto: "Olá!" },
-  { id: 3, usuario: "Maria", texto: "Tudo bem?" },
-  { id: 4, usuario: "Lucas", texto: "Como vai?" },
-  { id: 5, usuario: "Carla", texto: "Até logo!" }
+   { id: 1, usuario: "Ana", texto: "Bom dia!" },
+   { id: 2, usuario: "Pedro", texto: "Olá!" },
+   { id: 3, usuario: "Maria", texto: "Tudo bem?" },
+   { id: 4, usuario: "Lucas", texto: "Como vai?" },
+   { id: 5, usuario: "Carla", texto: "Até logo!" }
 ];
 
 function listarMensagens() { return mensagens; }
 
+function consultar(simularErro = false) { return new Promise((resolve, reject) => { setTimeout(() => { if (simularErro) return reject(new Error("Falha simulada"));
+resolve(mensagens); }, 1000); }); }
+
 app.get("/", (req, res) => {
-    res.send("Bem vindo(a) à Central de Informações da Escola!");
+   res.send("Bem vindo(a) à Central de Informações da Escola!");
 });
 
 app.get("/status", (req, res) => {
@@ -112,6 +115,26 @@ app.get("/mensagens/:id", (req, res) => {
 
 app.get("/total-mensagens", (req, res) => { 
    res.json({ total: mensagens.length });
+});
+
+app.get("/mensagens-then", (req, res) => {
+   consultar().then(lista => res.json(lista)).catch(() => res.status(500).json({ erro: "Falha na consulta" }));
+});
+
+app.get("/mensagens-async", async (req, res) => {
+   try {
+      res.json(await consultar()); 
+   } catch (erro) {
+      res.status(500).json({ erro: "Falha na consulta" });
+   } 
+});
+
+app.get("/mensagens-erro", async (req, res) => {
+   try {
+      res.json(await consultar(true));
+   } catch (erro) { 
+      res.status(500).json({ erro: "Falha simulada" });
+   }
 });
 
 app.listen(porta, () => {
